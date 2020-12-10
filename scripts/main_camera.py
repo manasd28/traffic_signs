@@ -324,15 +324,3 @@ Reading frames in the loop
 camera.release()
 # Destroying all opened OpenCV windows
 cv2.destroyAllWindows()
-
-
-"""
-Some comments
-
-cv2.VideoCapture(0)
-
-To capture video, it is needed to create VideoCapture object.
-Its argument can be camera's index or name of video file.
-Camera index is usually 0 for built-in one.
-Try to select other cameras by passing 1, 2, 3, etc.
-"""

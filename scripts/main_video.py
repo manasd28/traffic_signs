@@ -183,7 +183,7 @@ while True:
             roi = cv2.resize(roi,(32,32),interpolation=cv2.INTER_AREA)
             roi = keras.preprocessing.image.img_to_array(roi)
             roi = roi.astype('float')/255.0
-            roi = roi - np.mean(roi, axis=0)
+            roi = roi - roi.mean()
             roi = np.expand_dims(roi,axis=0)
             
             pred = model.predict(roi)

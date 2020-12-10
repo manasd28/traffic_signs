@@ -19,7 +19,7 @@ for img in os.listdir(path_to_test_images):
     h, w = image_BGR.shape[:2]
     
     # Load the trained keras model.
-    model = keras.models.load_model('../data_files/mnist_cnn2.h5')
+    model = keras.models.load_model('../data_files/model-13x13_new.h5')
     
     # Labels of the model.
     model_labels = ['Speed limit (20km/h)',
@@ -165,16 +165,15 @@ for img in os.listdir(path_to_test_images):
              # Find out the label of the current frame.
             roi = image_BGR[y_min : y_min+box_height, x_min : x_min+box_width] 
             roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
-            roi = cv2.resize(roi,(32,32),interpolation=cv2.INTER_AREA)
-            roi = keras.preprocessing.image.img_to_array(roi)
-            roi = roi.astype('float')/255.0
-            roi = roi - roi.mean()
+            roi = cv2.resize(roi,(32,32),interpolation=cv2.INTER_CUBIC)
+            roi = roi/255.0
+            # roi = roi - roi.mean()
             cv2.imshow("temp",roi)
             cv2.waitKey(0)
+            roi = keras.preprocessing.image.img_to_array(roi)
             roi = np.expand_dims(roi, axis=0)
-            
             pred = model.predict(roi)
-            found_label = model_labels[ np.argmax(pred) ]
+            found_label =  model_labels[np.argmax(pred)]
     
             # Putting text with label and confidence on the original image.
             cv2.putText(image_BGR, found_label, (x_min, y_min - 5),
