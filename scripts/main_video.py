@@ -4,9 +4,8 @@ import cv2
 import time
 import keras
 
-
 # Reading the input from the file.
-video = cv2.VideoCapture('../test_data/traffic-sign-to-test.mp4')
+video = cv2.VideoCapture('../test_data/videos/traffic-sign-to-test.mp4')
 
 # Preparing Writer variable.
 writer = None
@@ -19,7 +18,7 @@ with open('../data_files/classes.names') as f:
     labels = [line.strip() for line in f]
     
 # Loading the pre-trained model
-model = keras.models.load_model('../data_files/mnist_cnn2.h5')
+model = keras.models.load_model('../data_files/model-13x13.h5')
 
 # Label of the trained model
 model_labels = ['Speed limit (20km/h)',
@@ -87,9 +86,6 @@ colours = np.random.randint(0, 255, size=(len(labels), 3), dtype='uint8')
 
 # Create frame and time counter variables.
 f=0; t=0
-
-# Create an OpenCV resizable window.
-cv2.namedWindow("Result_Video", cv2.WINDOW_NORMAL)
 
 # Start of reading frames.
 while True:
@@ -180,13 +176,20 @@ while True:
             cv2.rectangle(frame, (x_min, y_min),
                           (x_min + box_width, y_min + box_height),
                           colour_box_current, 2)
-
-            # Preparing text with label and confidence for current bounding box
-            text_box_current = '{}: {:.4f}'.format(labels[int(class_numbers[i])],
-                                                   confidences[i])
-
+            
+            # Find out the label of the current frame
+            roi = frame[y_min : y_min+box_height, x_min : x_min+box_width]
+            roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
+            roi = cv2.resize(roi,(32,32),interpolation=cv2.INTER_AREA)
+            roi = keras.preprocessing.image.img_to_array(roi)
+            roi = roi.astype('float')/255.0
+            roi = roi - np.mean(roi, axis=0)
+            roi = np.expand_dims(roi,axis=0)
+            
+            pred = model.predict(roi)
+            found_label = model_labels[ np.argmax(pred) ]
             # Putting text with label and confidence on the original image
-            cv2.putText(frame, text_box_current, (x_min, y_min - 10),
+            cv2.putText(frame, found_label, (x_min, y_min - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, colour_box_current, 2)
 
     if writer is None:
@@ -195,14 +198,11 @@ while True:
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
         # Writing current frame into the writer.
-        writer = cv2.VideoWriter('../result_data/result-traffic-cars.mp4', fourcc, 30,
+        writer = cv2.VideoWriter('../result_data/videos/result-traffic-cars.mp4', fourcc, 30,
                                  (frame.shape[1], frame.shape[0]), True)
 
     # Write processed current frame to the file
     writer.write(frame)
-
-cv2.destroyWindow("Result_Video")
-
 
 # Printing final results.
 print()
