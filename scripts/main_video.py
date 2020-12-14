@@ -18,7 +18,7 @@ with open('../data_files/classes.names') as f:
     labels = [line.strip() for line in f]
     
 # Loading the pre-trained model
-model = keras.models.load_model('../data_files/model-13x13.h5')
+model = keras.models.load_model('../data_files/traffic_classifier.h5')
 
 # Label of the trained model
 model_labels = ['Speed limit (20km/h)',
@@ -180,14 +180,13 @@ while True:
             # Find out the label of the current frame
             roi = frame[y_min : y_min+box_height, x_min : x_min+box_width]
             roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
-            roi = cv2.resize(roi,(32,32),interpolation=cv2.INTER_AREA)
+            roi = cv2.resize(roi, (30,30),interpolation=cv2.INTER_AREA)
             roi = keras.preprocessing.image.img_to_array(roi)
-            roi = roi.astype('float')/255.0
-            roi = roi - roi.mean()
             roi = np.expand_dims(roi,axis=0)
             
             pred = model.predict(roi)
             found_label = model_labels[ np.argmax(pred) ]
+            
             # Putting text with label and confidence on the original image
             cv2.putText(frame, found_label, (x_min, y_min - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, colour_box_current, 2)

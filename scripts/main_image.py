@@ -8,6 +8,52 @@ import os
 # Path to save and load images.
 path_to_test_images = '../test_data/images/'
 path_to_save = '../result_data/images/'
+    
+# Load the trained keras model.
+model = keras.models.load_model('../data_files/traffic_classifier.h5')
+
+# Labels of the model.
+model_labels = ['Speed limit (20km/h)',
+ 'Speed limit (30km/h)',
+ 'Speed limit (50km/h)',
+ 'Speed limit (60km/h)',
+ 'Speed limit (70km/h)',
+ 'Speed limit (80km/h)',
+ 'End of speed limit (80km/h)',
+ 'Speed limit (100km/h)',
+ 'Speed limit (120km/h)', 'No passing',
+ 'No passing for vehicles over 3.5 metric tons',
+ 'Right-of-way at the next intersection',
+ 'Priority road',
+ 'Yield',
+ 'Stop',
+ 'No vehicles',
+ 'Vehicles over 3.5 metric tons prohibited',
+ 'No entry',
+ 'General caution',
+ 'Dangerous curve to the left',
+ 'Dangerous curve to the right',
+ 'Double curve',
+ 'Bumpy road',
+ 'Slippery road',
+ 'Road narrows on the right',
+ 'Road work',
+ 'Traffic signals',
+ 'Pedestrians',
+ 'Children crossing',
+ 'Bicycles crossing', 'Beware of ice/snow',
+ 'Wild animals crossing',
+ 'End of all speed and passing limits',
+ 'Turn right ahead',
+ 'Turn left ahead',
+ 'Ahead only',
+ 'Go straight or right',
+ 'Go straight or left',
+ 'Keep right',
+ 'Keep left',
+ 'Roundabout mandatory',
+ 'End of no passing',
+ 'End of no passing by vehicles over 3.5 metric tons']
 
 # Find all test images.
 for img in os.listdir(path_to_test_images):
@@ -18,51 +64,7 @@ for img in os.listdir(path_to_test_images):
     # Dimensions of the BGR image.
     h, w = image_BGR.shape[:2]
     
-    # Load the trained keras model.
-    model = keras.models.load_model('../data_files/model-13x13_new.h5')
     
-    # Labels of the model.
-    model_labels = ['Speed limit (20km/h)',
-     'Speed limit (30km/h)',
-     'Speed limit (50km/h)',
-     'Speed limit (60km/h)',
-     'Speed limit (70km/h)',
-     'Speed limit (80km/h)',
-     'End of speed limit (80km/h)',
-     'Speed limit (100km/h)',
-     'Speed limit (120km/h)', 'No passing',
-     'No passing for vehicles over 3.5 metric tons',
-     'Right-of-way at the next intersection',
-     'Priority road',
-     'Yield',
-     'Stop',
-     'No vehicles',
-     'Vehicles over 3.5 metric tons prohibited',
-     'No entry',
-     'General caution',
-     'Dangerous curve to the left',
-     'Dangerous curve to the right',
-     'Double curve',
-     'Bumpy road',
-     'Slippery road',
-     'Road narrows on the right',
-     'Road work',
-     'Traffic signals',
-     'Pedestrians',
-     'Children crossing',
-     'Bicycles crossing', 'Beware of ice/snow',
-     'Wild animals crossing',
-     'End of all speed and passing limits',
-     'Turn right ahead',
-     'Turn left ahead',
-     'Ahead only',
-     'Go straight or right',
-     'Go straight or left',
-     'Keep right',
-     'Keep left',
-     'Roundabout mandatory',
-     'End of no passing',
-     'End of no passing by vehicles over 3.5 metric tons']
     
    # Creating the blob from the current image.
     blob = cv2.dnn.blobFromImage(image_BGR, 1 / 255.0, (416, 416),
@@ -165,15 +167,12 @@ for img in os.listdir(path_to_test_images):
              # Find out the label of the current frame.
             roi = image_BGR[y_min : y_min+box_height, x_min : x_min+box_width] 
             roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
-            roi = cv2.resize(roi,(32,32),interpolation=cv2.INTER_CUBIC)
-            roi = roi/255.0
-            # roi = roi - roi.mean()
-            cv2.imshow("temp",roi)
-            cv2.waitKey(0)
+            roi = cv2.resize(roi,(30, 30),interpolation=cv2.INTER_CUBIC)
             roi = keras.preprocessing.image.img_to_array(roi)
             roi = np.expand_dims(roi, axis=0)
+            
             pred = model.predict(roi)
-            found_label =  model_labels[np.argmax(pred)]
+            found_label = model_labels[ np.argmax(pred) ]
     
             # Putting text with label and confidence on the original image.
             cv2.putText(image_BGR, found_label, (x_min, y_min - 5),
@@ -186,15 +185,6 @@ for img in os.listdir(path_to_test_images):
     print('Total objects been detected:', len(bounding_boxes))
     print('Number of objects left after non-maximum suppression:', counter - 1)
        
-    
-    # Showing Original Image with Detected Objects
-    cv2.namedWindow('Detections', cv2.WINDOW_NORMAL)
-    # Pay attention! 'cv2.imshow' takes images in BGR format
-    cv2.imshow('Detections', image_BGR)
-    # Waiting for any key being pressed
-    cv2.waitKey(0)
-    # Destroying opened window with name 'Detections'
-    cv2.destroyWindow('Detections')
 
 cv2.destroyAllWindows()
 
