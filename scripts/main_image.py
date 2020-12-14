@@ -55,6 +55,29 @@ model_labels = ['Speed limit (20km/h)',
  'End of no passing',
  'End of no passing by vehicles over 3.5 metric tons']
 
+# Load the names of the classes.
+with open('../data_files/classes.names') as f:
+    labels = [line.strip() for line in f]
+
+# Load the darnket network
+network = cv2.dnn.readNetFromDarknet('../data_files/ts.cfg',
+                                     '../data_files/ts.weights')
+
+# Getting list with names of all layers from YOLO v3 network
+layers_names_all = network.getLayerNames()
+
+layers_names_output = \
+    [layers_names_all[i[0] - 1] for i in network.getUnconnectedOutLayers()]
+
+# Setting the porbability threshold.
+probability_minimum = 0.5
+
+# Setting the non-maximum supression threshold.
+threshold = 0.3
+
+# Generate countours.
+colours = np.random.randint(0, 255, size=(len(labels), 3), dtype='uint8')
+
 # Find all test images.
 for img in os.listdir(path_to_test_images):
     
@@ -69,29 +92,6 @@ for img in os.listdir(path_to_test_images):
    # Creating the blob from the current image.
     blob = cv2.dnn.blobFromImage(image_BGR, 1 / 255.0, (416, 416),
                                  swapRB=True, crop=False)
-    
-    # Load the names of the classes.
-    with open('../data_files/classes.names') as f:
-        labels = [line.strip() for line in f]
-    
-    # Load the darnket network
-    network = cv2.dnn.readNetFromDarknet('../data_files/ts.cfg',
-                                         '../data_files/ts.weights')
-    
-    # Getting list with names of all layers from YOLO v3 network
-    layers_names_all = network.getLayerNames()
-
-    layers_names_output = \
-        [layers_names_all[i[0] - 1] for i in network.getUnconnectedOutLayers()]
-    
-    # Setting the porbability threshold.
-    probability_minimum = 0.5
-    
-    # Setting the non-maximum supression threshold.
-    threshold = 0.3
-    
-    # Generate countours.
-    colours = np.random.randint(0, 255, size=(len(labels), 3), dtype='uint8')
 
     # Start forward pass using blob as the input
     network.setInput(blob)

@@ -1,8 +1,8 @@
 import numpy as np 
-import pandas as pd 
 import matplotlib.pyplot as plt
 import cv2
 import os
+import keras
 
 from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
@@ -12,11 +12,11 @@ from keras.preprocessing.image import img_to_array
 data = []
 labels = []
 classes = 43
-cur_path = '../input/gtsrb-german-traffic-sign'
+cur_path = '../dataset_CNN/'
 
 #Retrieving the images and their labels 
 for i in range(classes):
-    path = os.path.join(cur_path,'Train',str(i))
+    path = os.path.join(cur_path,'train',str(i))
     images = os.listdir(path)
     for a in images:
         try:
@@ -83,13 +83,10 @@ plt.legend()
 plt.show()
 
 # Testing accuracy on test dataset
-from sklearn.metrics import accuracy_score
-y_test = pd.read_csv('../input/gtsrb-german-traffic-sign/Test.csv')
-labels = y_test["ClassId"].values
-imgs = y_test["Path"].values
-data=[]
+imgs = os.listdir(cur_path + 'test')
+
 for img in imgs:
-    image = cv2,imread()
+    image = cv2.imread()
     image = image.resize((30,30))
     data.append(np.array(image))
 X_test=np.array(data)
@@ -98,4 +95,4 @@ pred = model.predict_classes(X_test)
 # Accuracy with the test data
 from sklearn.metrics import accuracy_score
 print(accuracy_score(labels, pred))
-model.save('traffic_classifier.h5')
+model.save('../data_files/traffic_classifier1.h5')
