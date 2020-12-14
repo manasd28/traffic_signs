@@ -12,6 +12,8 @@
   - `tensorflow`
   - `keras`
   - `numpy`
+  - `matplotlib`
+  - `sklearn`
 
 ## Usage : ##
   
