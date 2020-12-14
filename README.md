@@ -12,6 +12,7 @@
   - `tensorflow`
   - `keras`
   - `numpy`
+  - `pandas`
   - `matplotlib`
   - `sklearn`
 
