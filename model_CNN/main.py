@@ -2,18 +2,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 import os
-import keras
+
+import tensorflow as tf
 
 from sklearn.model_selection import train_test_split
 from keras.utils import to_categorical
-from keras.layers import Conv2D, MaxPool2D, Dense, Flatten, Dropout, Sequential
+from keras.layers import Conv2D, MaxPool2D, Dense, Flatten, Dropout
 from keras.preprocessing.image import img_to_array
+from keras.models import Sequential
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+
+physical_devices = tf.config.list_physical_devices("GPU")
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 data = []
 labels = []
 classes = 43
 cur_path = '../dataset_CNN/'
 
+print("Reading Train Images!! Please Wait")
 #Retrieving the images and their labels 
 for i in range(classes):
     path = os.path.join(cur_path,'train',str(i))
@@ -26,9 +34,10 @@ for i in range(classes):
             image = img_to_array(image)
             data.append(image)
             labels.append(i)
-            print('Image read successfully')
         except Exception as e:
             print(e)
+
+print("Reading test Images Sucessfull!!")
 
 #Converting lists into numpy arrays
 data = np.array(data)
@@ -82,15 +91,9 @@ plt.ylabel('loss')
 plt.legend()
 plt.show()
 
-# Testing accuracy on test dataset
-imgs = os.listdir(cur_path + 'test')
-
-for img in imgs:
-    image = cv2.imread()
-    image = image.resize((30,30))
-    data.append(np.array(image))
-X_test=np.array(data)
 pred = model.predict_classes(X_test)
+
+labels = [np.argmax(item) for item in y_test]
 
 # Accuracy with the test data
 from sklearn.metrics import accuracy_score
