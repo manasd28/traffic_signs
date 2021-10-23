@@ -75,8 +75,7 @@ network = cv2.dnn.readNetFromDarknet('../data_files/ts.cfg',
 layers_names_all = network.getLayerNames()
 
 # Getting the name of all the layers.
-layers_names_output = \
-    [layers_names_all[i[0] - 1] for i in network.getUnconnectedOutLayers()]
+layers_names_output = [layers_names_all[i[0] - 1] for i in network.getUnconnectedOutLayers()]
 
 # Settting minimum probability threshold to eleminate weak predictions.
 probability_minimum = 0.5

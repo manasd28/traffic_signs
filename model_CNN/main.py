@@ -91,7 +91,7 @@ plt.ylabel('loss')
 plt.legend()
 plt.show()
 
-pred = model.predict_classes(X_test)
+pred = model.predict(X_test)
 
 labels = [np.argmax(item) for item in y_test]
 
